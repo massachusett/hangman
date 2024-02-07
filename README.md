@@ -1,2 +1,12 @@
-# hangman
-Automated strategy to play hangman on an unseen corpus of words
+# Hangman
+
+This repository explores an automated, n-gram-based strategy to play hangman on an unseen corpus of words.
+
+My Hangman algorithm is implemented as follows:
+1. For all words in the training corpus, calculate the number of occurrences of each n-gram (for n = 1,..., 5). An n-gram is a particular substring of letters of length n.
+2. At the beginning of each game, compute the percentage of letters that are vowels for each word that has length less than or equal to the word we are guessing. Then, compute the 75-th quantile of these values. We will use this new value as a cutoff; that is, if the percentage of known vowels in the word we are trying to guess ever surpasses this threshold, we will remove all remaining unguessed vowels from the set of possible letters to guess.
+3. Now, for each round of each game, we guess the next letter by calculating the expected number of occurrences of each unguessed letter and selecting the letter with the maximum such value. We calculate this expectation as the sum of the probabilities of a letter occurring at each unfilled space. We calculate these individual probabilities as follows:
+  a. First, we find the most “informative” substring of consecutive known letters immediately surrounding the empty space. We define informative using two criteria: 1. Length: longer substrings of known letters provide more information about the distribution of the letter in the empty space. We select the longest possible substring up to a length of five letters (including the empty space). 2.  Centered-ness: If there are multiple substrings of more than five letters, we select the one that is most centered around the empty space. That is, we select the substring which has a similar number of known letters to either side of the empty space.
+  b. Once we have selected our conditional information substring, we consider the subset of n-grams which match the known letters and have an unguessed letter in the empty space. If there are no known letters immediately adjacent to the empty space, we consider the unigrams for each unguessed letter. Thus, there is always one associated n-gram for each unguessed letter. 
+  c. Then, for each possible unguessed letter, we calculate its probability of occurring in the blank space as the number of occurrences of its specific n-gram (as found in the training corpus) divided by the total number of occurrences of all of the n-grams in the relevant subset.
+
